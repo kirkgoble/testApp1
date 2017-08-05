@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        @media screen and (orientation:portrait) {
+        #hider{visibility: visible}
+        }
+
+        @media screen and (orientation:landscape) {
+        /*CSS applied when the device is in landscape mode*/
+            #hider{visibility: hidden}
+        }
+</style>
+        <script src="motionstack-v1.0.1.js"></script>
+    <script>
+
+
+
+
+        function init() {
+
+
+
+
+
+                 navigator.vibrate = navigator.vibrate ||
+                         navigator.webkitVibrate ||
+                         navigator.mozVibrate ||
+                         navigator.msVibrate;
+
+                 if (navigator.vibrate) {
+                     //console.log('we can vibrate');
+                     document.getElementById("message").innerHTML = "we can vibrate";
+                 } else {
+                     document.getElementById("message").innerHTML = "no vibrate";
+                 }
+
+
+                 var myTimeOut;
+
+                 var shake = new MotionStack.Shake({
+                     direction: "all"
+                 });
+
+                 shakeV1.start(function (e) {
+                     console.log(e.shakeCount);
+                     document.getElementById("shakeCount").innerHTML = e.shakeCount;
+
+                     document.getElementById("diff").innerHTML = "0";
+                     clearTimeout(myTimeOut);
+                     myTimeOut = setTimeout(myTimeout1, 2000);
+
+
+                     if (e.shakeCount === 20) {
+                         //shake.stop();
+                     }
+                 });
+
+                 function myTimeout1() {
+                     document.getElementById("diff").innerHTML = "2 seconds";
+                 }
+
+             }
+
+
+
+
+
+
+
+
+
+//var shakeProgress = new MotionStack.ShakeProgress({
+//    minShakes: 10,
+//    minTime: 1000,
+//    direction: "all"
+//});
+//
+//shakeProgress.start(function (e) {
+//    console.log(e.progress);
+//    document.getElementById("shakeCount").innerHTML = e.progress;
+//
+//    if (e.progress == 1) {
+//        shakeProgress.stop();
+//    }
+//});
+
+        </script>
+</head>
+<body style="margin: 0" onload="init();">
+    <div id='hider' style="font-size: 8em; width: 100vw; height: 100vh;background-color: black; color: white">
+    <div style="color: white; width: 80%;height: 40%;padding-top: 50%;margin:0 auto;text-align: center;">Landscape only for demo</div>
+    </div>
+    <div id="mainContainer" style="position: absolute;top: 0;left: 0">
+        <div id='message' style="font-size: 6em">xx</div>
+        <div id='shakeCount' style="font-size: 6em">0</div>
+        <div id='timeStamp' style="font-size: 6em">0</div>
+        <div id='diff' style="font-size: 6em">0</div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!--
+	NOTES:
+	1. All tokens are represented by '$' sign in the template.
+	2. You can write your code only wherever mentioned.
+	3. All occurrences of existing tokens will be replaced by their appropriate values.
+	4. Blank lines will be removed automatically.
+	5. Remove unnecessary comments before creating your template.
+-->
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="authoring-tool" content="Adobe_Animate_CC">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+	<title>aniShake</title>
+	<style>
+		#animation_container {
+			position:absolute;
+			margin:auto;
+			left:0;right:0;
+			top:0;bottom:0;
+		}
+
+		#animation_container #canvas{
+			-webkit-tap-highlight-color: transparent;
+		}
+	</style>
+	<!-- write your code here -->
+    <script type="text/javascript" src="cordova.js"></script>
+	<script src="motionstack-v1.0.1.js"></script>
+	<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+	<script src="aniShake.js?1501671346584"></script>
+	<script>
+		var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation;
+		function init() {
+
+			navigator.vibrate = navigator.vibrate ||
+					navigator.webkitVibrate ||
+					navigator.mozVibrate ||
+					navigator.msVibrate;
+
+			if (navigator.vibrate) {
+				//console.log('we can vibrate');
+				document.getElementById("message").innerHTML = "we can vibrate";
+			} else {
+				document.getElementById("message").innerHTML = "no vibrate";
+			}
+
+
+			var myTimeOut;
+
+			var shake = new MotionStack.Shake({
+				direction: "all"
+			});
+
+			shake.start(function (e) {
+				console.log(e.shakeCount);
+				document.getElementById("shakeCount").innerHTML = e.shakeCount;
+
+				document.getElementById("diff").innerHTML = "0";
+				clearTimeout(myTimeOut);
+				myTimeOut = setTimeout(myTimeout1, 500);
+				exportRoot.doShake(e.shakeCount);
+                navigator.vibrate(3000);
+
+
+                if (e.shakeCount === 20) {
+					//shake.stop();
+				}
+			});
+
+			function myTimeout1() {
+				document.getElementById("diff").innerHTML = "1 second";
+				exportRoot.shakeStopped();
+			}
+			init2();
+		}
+
+		function init2() {
+			canvas = document.getElementById("canvas");
+			anim_container = document.getElementById("animation_container");
+			dom_overlay_container = document.getElementById("dom_overlay_container");
+			var comp=AdobeAn.getComposition("EDEE2F7BDA724F9F88DCEA9607090FE7");
+			var lib=comp.getLibrary();
+			handleComplete({},comp);
+		}
+		function handleComplete(evt,comp) {
+			//This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
+			var lib=comp.getLibrary();
+			var ss=comp.getSpriteSheet();
+			exportRoot = new lib.aniShake();
+			stage = new lib.Stage(canvas);
+			stage.addChild(exportRoot);
+			//Registers the "tick" event listener.
+			fnStartAnimation = function() {
+				createjs.Ticker.setFPS(lib.properties.fps);
+				createjs.Ticker.addEventListener("tick", stage);
+			}
+			//Code to support hidpi screens and responsive scaling.
+			function makeResponsive(isResp, respDim, isScale, scaleType) {
+				var lastW, lastH, lastS=1;
+				window.addEventListener('resize', resizeCanvas);
+				resizeCanvas();
+				function resizeCanvas() {
+					var w = lib.properties.width, h = lib.properties.height;
+					var iw = window.innerWidth, ih=window.innerHeight;
+					var pRatio = window.devicePixelRatio || 1, xRatio=iw/w, yRatio=ih/h, sRatio=1;
+					if(isResp) {
+						if((respDim=='width'&&lastW==iw) || (respDim=='height'&&lastH==ih)) {
+							sRatio = lastS;
+						}
+						else if(!isScale) {
+							if(iw<w || ih<h)
+								sRatio = Math.min(xRatio, yRatio);
+						}
+						else if(scaleType==1) {
+							sRatio = Math.min(xRatio, yRatio);
+						}
+						else if(scaleType==2) {
+							sRatio = Math.max(xRatio, yRatio);
+						}
+					}
+					canvas.width = w*pRatio*sRatio;
+					canvas.height = h*pRatio*sRatio;
+					canvas.style.width = dom_overlay_container.style.width = anim_container.style.width =  w*sRatio+'px';
+					canvas.style.height = anim_container.style.height = dom_overlay_container.style.height = h*sRatio+'px';
+					stage.scaleX = pRatio*sRatio;
+					stage.scaleY = pRatio*sRatio;
+					lastW = iw; lastH = ih; lastS = sRatio;
+				}
+			}
+			makeResponsive(true,'both',true,1);
+			AdobeAn.compositionLoaded(lib.properties.id);
+			fnStartAnimation();
+		}
+	</script>
+	<!-- write your code here -->
+</head>
+<body onload="init();" style="margin:0px;">
+
+<!--<div id='hider' style="font-size: 8em; width: 100vw; height: 100vh;background-color: black; color: white">-->
+	<!--<div style="color: white; width: 80%;height: 40%;padding-top: 50%;margin:0 auto;text-align: center;">Landscape only for demo</div>-->
+<!--</div>-->
+
+<div id="animation_container" style="background-color:rgba(255, 255, 255, 1.00); width:2048px; height:1536px">
+	<canvas id="canvas" width="2048" height="1400" style="position: absolute; display: block; background-color:rgba(0, 0, 0, .1);"></canvas>
+	<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:2048px; height:1400px; position: absolute; left: 0px; top: 0px; display: block;">
+	</div>
+</div>
+<div id="mainContainer" style="position: absolute;bottom: 0;left: 0">
+	<div id='message' style="font-size: 1em">xx</div>
+	<div id='shakeCount' style="font-size: 4em">0</div>
+	<div id='timeStamp' style="font-size: 1em">0</div>
+	<div id='diff' style="font-size: 1em">0</div>
+	<button onclick="exportRoot.doShake()" style="">doShake</button>
+	<button onclick="exportRoot.shakeStopped()" style="">shakeStopped</button>
+</div>
+</body>
+</html>
