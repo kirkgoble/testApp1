@@ -82,15 +82,29 @@
 			dom_overlay_container = document.getElementById("dom_overlay_container");
 			var comp=AdobeAn.getComposition("EDEE2F7BDA724F9F88DCEA9607090FE7");
 			var lib=comp.getLibrary();
-			handleComplete({},comp);
+			var loader = new createjs.LoadQueue(false);
+			loader.addEventListener("fileload", function(evt){handleFileLoad(evt,comp)});
+			loader.addEventListener("complete", function(evt){handleComplete(evt,comp)});
+			var lib=comp.getLibrary();
+			loader.loadManifest(lib.properties.manifest);
+		}
+		function handleFileLoad(evt, comp) {
+			var images=comp.getImages();
+			if (evt && (evt.item.type == "image")) { images[evt.item.id] = evt.result; }
 		}
 		function handleComplete(evt,comp) {
 			//This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
 			var lib=comp.getLibrary();
 			var ss=comp.getSpriteSheet();
+			var queue = evt.target;
+			var ssMetadata = lib.ssMetadata;
+			for(i=0; i<ssMetadata.length; i++) {
+				ss[ssMetadata[i].name] = new createjs.SpriteSheet( {"images": [queue.getResult(ssMetadata[i].name)], "frames": ssMetadata[i].frames} )
+			}
 			exportRoot = new lib.aniShake();
 			stage = new lib.Stage(canvas);
 			stage.addChild(exportRoot);
+			stage.enableMouseOver();
 			//Registers the "tick" event listener.
 			fnStartAnimation = function() {
 				createjs.Ticker.setFPS(lib.properties.fps);
@@ -136,15 +150,15 @@
 	</script>
 	<!-- write your code here -->
 </head>
-<body onload="init();" style="margin:0px;">
+<body onload="init();" style="margin:0px;background-color: grey;">
 
 <!--<div id='hider' style="font-size: 8em; width: 100vw; height: 100vh;background-color: black; color: white">-->
 	<!--<div style="color: white; width: 80%;height: 40%;padding-top: 50%;margin:0 auto;text-align: center;">Landscape only for demo</div>-->
 <!--</div>-->
 
 <div id="animation_container" style="background-color:rgba(255, 255, 255, 1.00); width:2048px; height:1536px">
-	<canvas id="canvas" width="2048" height="1400" style="position: absolute; display: block; background-color:rgba(0, 0, 0, .1);"></canvas>
-	<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:2048px; height:1400px; position: absolute; left: 0px; top: 0px; display: block;">
+	<canvas id="canvas" width="2048" height="1536" style="position: absolute; display: block; background-color:rgba(0, 0, 0, .1);"></canvas>
+	<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:2048px; height:1536px; position: absolute; left: 0px; top: 0px; display: block;">
 	</div>
 </div>
 <div id="mainContainer" style="position: absolute;bottom: 0;left: 0">
